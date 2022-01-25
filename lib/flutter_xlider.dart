@@ -473,6 +473,7 @@ class _FlutterSliderState extends State<FlutterSlider>
     hatchMark.labels = widget.hatchMark!.labels ?? null;
     hatchMark.linesAlignment = widget.hatchMark!.linesAlignment;
     hatchMark.displayLines = widget.hatchMark!.displayLines ?? false;
+    hatchMark.hideBothEnds = widget.hatchMark!.hideBothEnds;
 
     if (hatchMark.displayLines!) {
       double percent = 100 * hatchMark.density;
@@ -504,6 +505,13 @@ class _FlutterSliderState extends State<FlutterSlider>
 
       Widget barLine;
       for (int p = 0; p <= percent; p++) {
+        // p は HatchMark のインデックスに相当する。
+        // 両端では HatchMark を描画しないため、スキップする
+        if (hatchMark.hideBothEnds) {
+          if (p == 0 || p == percent) {
+            continue;
+          }
+        }
         FlutterSliderSizedBox? barLineBox = hatchMark.smallLine;
 
         if (p % 5 - 1 == -1) {
@@ -2609,19 +2617,21 @@ class FlutterSliderHatchMark {
   FlutterSliderSizedBox? labelBox;
   FlutterSliderHatchMarkAlignment linesAlignment;
   bool? displayLines;
+  bool hideBothEnds;
 
-  FlutterSliderHatchMark(
-      {this.disabled = false,
-      this.density = 1,
-      this.linesDistanceFromTrackBar,
-      this.labelsDistanceFromTrackBar,
-      this.labels,
-      this.smallLine,
-      this.bigLine,
-      this.linesAlignment = FlutterSliderHatchMarkAlignment.right,
-      this.labelBox,
-      this.displayLines})
-      : assert(density > 0 && density <= 2);
+  FlutterSliderHatchMark({
+    this.disabled = false,
+    this.density = 1,
+    this.linesDistanceFromTrackBar,
+    this.labelsDistanceFromTrackBar,
+    this.labels,
+    this.smallLine,
+    this.bigLine,
+    this.linesAlignment = FlutterSliderHatchMarkAlignment.right,
+    this.labelBox,
+    this.displayLines,
+    this.hideBothEnds = false,
+  }) : assert(density > 0 && density <= 2);
 
   @override
   String toString() {
